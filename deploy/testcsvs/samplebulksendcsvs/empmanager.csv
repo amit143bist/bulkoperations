@@ -1,3 +1,0 @@
-Employee::Name,Employee::Email,Employee::accessCode,Manager::Name,Manager::Email,Manager::Identification,Manager::PhoneNumber,Employee::EmployeeName,Manager::ManagerName,Employee::Seattle,Employee::Chicago,Employee::Color,Employee::Communication
-Employee One,docusign.sso+employeeone@gmail.com,12345,Manager One,docusign.sso+managerone@gmail.com,SMS,+17089169638,Employee One,Manager One,X,,Red,Email
-Employee Two,docusign.sso+employeetwo@gmail.com,54321,Manager Two,docusign.sso+managertwo@gmail.com,SMS,+17089169638,Employee Two,Manager Two,,X,Blue,Mobile
