@@ -1,1 +1,0 @@
-"environment,system,id,lastLogin,rights,disabled,firstName,lastName,fullName,owner,ownerType,personal,priv,startDate,expiry,description,node,approver,authContact,groupName				""
