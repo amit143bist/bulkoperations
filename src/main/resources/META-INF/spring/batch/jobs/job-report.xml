@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/batch 
+	http://www.springframework.org/schema/batch/spring-batch.xsd
+	http://www.springframework.org/schema/task 
+	http://www.springframework.org/schema/task/spring-task.xsd
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	<bean
+		class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+	<context:component-scan
+		base-package="com.docusign.proserv.application.utils" />
+
+	<!-- partitioner job -->
+	<batch:job id="reportJob">
+
+		<batch:step id="partitionedInventoryLoadStep">
+			<batch:partition step="inventoryLoadStep"
+				partitioner="inventoryFilePartitioner">
+				<batch:handler grid-size="10"
+					task-executor="inventoryLoadTaskExecutor" />
+			</batch:partition>
+		</batch:step>
+
+	</batch:job>
+
+	<!-- each thread will run this job, with different stepExecutionContext 
+		values. -->
+	<batch:step id="inventoryLoadStep"
+		xmlns="http://www.springframework.org/schema/batch">
+		<batch:tasklet>
+			<batch:chunk reader="cvsFileItemReader"
+				writer="cvsFileItemWriter" processor="dsAPIProcessor"
+				commit-interval="5000">
+				<batch:listeners>
+					<batch:listener ref="customItemProcessListener"></batch:listener>
+					<batch:listener ref="customItemProcessStepListener"></batch:listener>
+				</batch:listeners>
+			</batch:chunk>
+		</batch:tasklet>
+	</batch:step>
+
+	<bean id="customItemProcessListener"
+		class="com.docusign.batch.listener.CustomItemProcessListener" />
+		
+	<bean id="customItemProcessStepListener"
+		class="com.docusign.batch.listener.CustomItemProcessStepListener" />
+
+	<bean id="proServServiceTemplate"
+		class="com.docusign.proserv.application.webservice.ProServServiceTemplate" />
+
+	<bean id="inventoryFilePartitioner"
+		class="com.docusign.batch.partition.MultiFileResourcePartitioner"
+		scope="step">
+		<property name="inboundDir"
+			value="#{jobParameters['inputDirectoryPath']}" />
+	</bean>
+
+	<bean id="inventoryLoadTaskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"
+		depends-on="appParameters" scope="step">
+		<property name="corePoolSize"
+			value="#{appParameters.coreThreadPoolSize}" />
+		<property name="maxPoolSize"
+			value="#{appParameters.maxThreadPoolSize}" />
+		<property name="allowCoreThreadTimeOut" value="true" />
+	</bean>
+
+	<bean id="objectMapper"
+		class="com.fasterxml.jackson.databind.ObjectMapper" />
+
+	<!-- Filtering process -->
+	<bean id="dsAPIProcessor"
+		class="com.docusign.batch.processor.DSAPIProcessor" scope="step">
+		<property name="baseUri" value="#{jobParameters['baseUri']}" />
+		<property name="accountGuid"
+			value="#{jobParameters['accountGuid']}" />
+	</bean>
+
+	<bean id="cvsFileItemReader"
+		class="org.springframework.batch.item.file.FlatFileItemReader"
+		scope="step">
+
+		<property name="resource"
+			value="#{stepExecutionContext['fileResource']}" />
+
+		<property name="lineMapper">
+			<bean
+				class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean
+						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names"
+							value="envelopeId,reminderEnabled,reminderDelay,reminderFrequency,expireEnabled,expireAfter,expireWarn" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="com.docusign.batch.mapper.EnvelopeSetMapper">
+						<property name="appParameters" ref="appParameters" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+
+	</bean>
+
+	<bean id="cvsFileItemWriter"
+		class="org.springframework.batch.item.file.FlatFileItemWriter"
+		scope="step">
+		<!-- write to this csv file -->
+		<property name="resource"
+			value="file:#{jobParameters['outputDirectoryPath']}/report.processed_#{jobParameters['jobStartTime']}_#{stepExecutionContext['fileName']}" />
+		<property name="shouldDeleteIfExists" value="false" />
+
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="#{psProps.outputFileDelimiter}" />
+				<property name="fieldExtractor">
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names"
+							value="envelopeId,reminderEnabled,reminderDelay,reminderFrequency,expireEnabled,expireAfter,expireWarn,success,transMessage" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

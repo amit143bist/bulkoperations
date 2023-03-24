@@ -1,0 +1,10 @@
+#BulkSend MailingList creation as per File and template or draftenvelope
+# ds.account.bulksend.use.filebased.creation=false
+# ds.account.bulksend.use.template=true
+# ds.account.bulksend.template.id=a3f33888-bc02-44c0-8f8c-969bbd110c3b
+ds.input.file.split=true
+ds.input.file.split.lines=500
+ds.envelope.update.use.global.variables=true
+ds.envelope.update.api.status=voided
+ds.envelope.update.api.voidedreason="Created by mistake-Test"
+ds.api.thresholdpercent=10

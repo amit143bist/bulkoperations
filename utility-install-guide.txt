@@ -1,0 +1,40 @@
+ProServ Utilities 1.0 - Installation Guide
+-----------------------------------
+Prerequisite:
+
+a. Java version >= 1.8
+b. Text Editor
+
+Installation Steps:
+1) Copy all the artifacts to a location on your server - [dir]
+2) Open ps_oauth_bulk_process_*.bat/ps_oauth_bulk_process_*.sh (* represents demo or prod) in a text editor and
+   update the required inputs
+3) Execute ps_oauth_bulk_process_*.bat/ps_oauth_bulk_process_*.sh (* represents demo or prod) in [dir] using command window.
+
+Artifacts contents:
+1) proServUtilities-1.0.jar
+2) ps_oauth_bulk_process_demo.bat/ps_oauth_bulk_process_demo.sh (For Demo)
+3) ps_oauth_bulk_process_prod.bat/ps_oauth_bulk_process_prod.sh (For Prod)
+4) input folder
+5) output folder
+6) ds-private.key - RSA Private Key
+7) ds-public.key - RSA Public Key
+
+Input(s): 
+
+ps_oauth_bulk_process_demo.bat/ps_oauth_bulk_process_demo.sh (For Demo) or
+ps_oauth_bulk_process_prod.bat/ps_oauth_bulk_process_prod.sh (For Prod) need to be updated with below inputs.
+
+a. utilityPath - This is the folder path where all artifacts are created or downloaded
+b. IntegratorKey
+c. Admin User Guid (either with Admin or User Consent)
+d. validAccountGuids
+e. Private/Public RSA Key pair
+f. Input CSV with envelopeId,reminderEnabled,reminderDelay,reminderFrequency,expireEnabled,expireAfter,expireWarn columns
+g. Proxy Port or Host if needed to call external APIs from your system
+h. Provide inDirpath where input CSV(s) is/are present and outDirpath where system will 
+   write the output CSV(s)
+
+Output:
+a. outDirpath will have output CSVs with results for each envelopeIds success or failure
+b. proServUtilities.log will be created for each run

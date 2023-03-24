@@ -1,0 +1,4 @@
+#BulkSend MailingList creation as per File and template or draftenvelope
+ds.account.bulksend.use.filebased.creation=false
+ds.account.bulksend.draftenvelope.creation.folder=C:/technuggets/autosolution/config
+ds.account.bulksend.envelopeortemplateid.file=CreateEnvelopeTemplate.json

@@ -1,0 +1,5 @@
+#BulkSend MailingList creation as per File and template or draftenvelope
+ds.api.thresholdpercent=10
+ds.account.bulksend.use.filebased.creation=false
+ds.account.bulksend.use.template=true
+ds.account.bulksend.template.id=d292cbb8-d3ae-458b-bec1-772647402a1f

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/batch 
+	http://www.springframework.org/schema/batch/spring-batch.xsd
+	http://www.springframework.org/schema/task 
+	http://www.springframework.org/schema/task/spring-task.xsd
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	<bean
+		class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+	<context:component-scan
+		base-package="com.docusign.proserv.application.utils" />
+
+	<bean id="customItemProcessListener"
+		class="com.docusign.batch.listener.CustomItemProcessListener" scope="step"/>
+
+	<bean id="customItemProcessStepListener"
+		class="com.docusign.batch.listener.CustomItemProcessStepListener"
+		scope="step">
+		<property name="outboundSuccessDir"
+			value="#{jobParameters['outputSuccessDirectoryPath']}" />
+		<property name="inboundDir"
+			value="#{jobParameters['inputDirectoryPath']}" />
+		<property name="outputDirectoryPath"
+			value="#{jobParameters['outputDirectoryPath']}" />
+	</bean>
+
+	<bean id="proServServiceTemplate"
+		class="com.docusign.proserv.application.webservice.ProServServiceTemplate" />
+
+	<bean id="inventoryFilePartitioner"
+		class="com.docusign.batch.partition.MultiFileResourcePartitioner"
+		scope="step">
+		<property name="inboundDir"
+			value="#{jobParameters['inputDirectoryPath']}" />
+	</bean>
+
+	<bean id="inventoryLoadTaskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"
+		depends-on="appParameters" scope="step">
+		<property name="corePoolSize"
+			value="#{appParameters.coreThreadPoolSize}" />
+		<property name="maxPoolSize"
+			value="#{appParameters.maxThreadPoolSize}" />
+		<property name="allowCoreThreadTimeOut" value="true" />
+	</bean>
+
+	<bean id="objectMapper"
+		class="com.fasterxml.jackson.databind.ObjectMapper" />
+
+	<bean id="cvsFileItemReader"
+		class="org.springframework.batch.item.file.FlatFileItemReader"
+		scope="step">
+
+		<property name="resource"
+			value="#{stepExecutionContext['fileResource']}" />
+
+		<property name="linesToSkip" value="1" />
+
+		<property name="skippedLinesCallback"
+			ref="skippedLinesCallback"></property>
+
+		<property name="lineMapper">
+			<bean
+				class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+
+				<property name="lineTokenizer" ref="dynamicTokenizer" />
+				<property name="fieldSetMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="prototypeBeanName"
+							value="envelopeUpdateDetails" />
+					</bean>
+				</property>
+
+			</bean>
+		</property>
+
+	</bean>
+
+	<bean id="dynamicTokenizer"
+		class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+		<property name="strict" value="true" />
+		<property name="delimiter" value="#{psProps.inputFileDelimiter}" />
+	</bean>
+
+	<bean id="envelopeUpdateDetails"
+		class="com.docusign.batch.domain.EnvelopeUpdateDetails"
+		scope="prototype"></bean>
+
+	<bean id="customFlatFileHeaderCallback"
+		class="com.docusign.batch.item.file.CustomFlatFileHeaderCallback"></bean>
+
+	<bean id="skippedLinesCallback"
+		class="com.docusign.batch.item.file.CustomLineCallbackHandler"
+		scope="step">
+		<property name="customFlatFileHeaderCallback"
+			ref="customFlatFileHeaderCallback" />
+		<property name="successColumns" value="transactionTimeStamp,success,transMessage" />
+		<property name="lineTokenizer" ref="dynamicTokenizer" />
+		<property name="delimiter" value="#{psProps.inputFileDelimiter}" />
+	</bean>
+
+	<bean id="cvsFileItemWriter"
+		class="org.springframework.batch.item.file.FlatFileItemWriter"
+		scope="step">
+		<!-- write to this csv file -->
+
+		<property name="headerCallback"
+			ref="customFlatFileHeaderCallback" />
+		<property name="resource"
+			value="file:#{jobParameters['outputDirectoryPath']}/dsenvelopeupdate.processed_#{jobParameters['jobStartTime']}_#{stepExecutionContext['fileName']}" />
+		<property name="shouldDeleteIfExists" value="false" />
+
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="#{psProps.outputFileDelimiter}" />
+				<property name="fieldExtractor">
+					<bean id="customBeanWrapperFieldExtractor"
+						class="com.docusign.batch.item.file.CustomBeanWrapperFieldExtractor">
+						<property name="customFlatFileHeaderCallback"
+							ref="customFlatFileHeaderCallback" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

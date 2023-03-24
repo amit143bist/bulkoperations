@@ -1,0 +1,71 @@
+{
+	"compositeTemplates": [
+		{
+			"inlineTemplates": [
+				{
+					"recipients": {
+						"signers": [
+							{
+								"recipientId": 1,
+								"roleName": "Employee",
+								"name": "Multi Bulk Recipient::Employee",
+								"email": "multiBulkRecipients-Employee@docusign.com"
+							},
+							{
+								"recipientId": 2,
+								"roleName": "Manager",
+								"name": "Multi Bulk Recipient::Manager",
+								"email": "multiBulkRecipients-Manager@docusign.com"
+							}
+						]
+					},
+					"sequence": 2
+				}
+			],
+			"serverTemplates": [
+				{
+					"templateId": "d292cbb8-d3ae-458b-bec1-772647402a1f",
+					"sequence": 1
+				}
+			]
+		},
+		{
+			"inlineTemplates": [
+				{
+					"recipients": {
+						"signers": [
+							{
+								"recipientId": 1,
+								"roleName": "Employee",
+								"name": "Multi Bulk Recipient::Employee",
+								"email": "multiBulkRecipients-Employee@docusign.com"
+							},
+							{
+								"recipientId": 2,
+								"roleName": "Manager",
+								"name": "Multi Bulk Recipient::Manager",
+								"email": "multiBulkRecipients-Manager@docusign.com"
+							}
+						]
+					},
+					"sequence": 2,
+					"customFields": {
+						"textCustomFields": [
+							{
+								"name": "fileName",
+								"value": ""
+							}
+						]
+					}
+				}
+			],
+			"serverTemplates": [
+				{
+					"templateId": "bd408153-5b8a-4b66-8461-a1cfa95620a7",
+					"sequence": 1
+				}
+			]
+		}
+	],
+	"status": "created"
+}

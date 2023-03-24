@@ -1,0 +1,4 @@
+#Set Global Variables
+ds.envelope.update.use.global.variables=true
+ds.envelope.update.api.emailsubject=
+ds.envelope.update.api.emailblurb=

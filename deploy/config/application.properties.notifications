@@ -1,0 +1,11 @@
+ds.api.thresholdpercent=20
+#Set Global Variables
+ds.envelope.update.use.global.variables=true
+
+ds.envelope.update.api.expire.enabled=true
+ds.envelope.update.api.expire.after=60
+ds.envelope.update.api.expire.warn=2
+
+ds.envelope.update.api.reminder.enabled=true
+ds.envelope.update.api.reminder.delay=10
+ds.envelope.update.api.reminder.frequency=2

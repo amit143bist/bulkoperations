@@ -1,0 +1,13 @@
+#BulkSend MailingList creation as per File and template or draftenvelope
+ds.account.bulksend.use.filebased.creation=true
+ds.account.bulksend.filePattern=ssnfile,empmanager
+ds.account.bulksend.ssnfile.pattern=template
+ds.account.bulksend.ssnfile.templateid=2aff0bda-0c19-4d5c-8dc5-14d84f142855
+ds.account.bulksend.empmanager.pattern=template
+ds.account.bulksend.empmanager.templateid=d292cbb8-d3ae-458b-bec1-772647402a1f
+
+#Set Tabvalue replace characters
+ds.account.bulksend.replace.tabdata=false
+ds.account.bulksend.replace.tabdata.tablabels=Notice_MeetingDayDate
+ds.account.bulksend.replace.tabdata.tablabels.Notice_MeetingDayDate.fromchar=#
+ds.account.bulksend.replace.tabdata.tablabels.Notice_MeetingDayDate.tochar=,
